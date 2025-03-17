@@ -69,22 +69,44 @@ app.get('/contact/:id', (req, res) => {
 })
 
 app.post('/employees', (req, res) => {
-  const {first_name, last_name} = req.body;
   knex('employees')
-  .insert(req.body)
-  .then(() => res.status(200).send('Employee added'))
-  .catch(err =>
-    res.status(404).json({
-    message: 'The data you are looking for could not be found. Please try again '
-    }))
+    .insert(req.body)
+    .then(data => res.status(201).json('Employee added'))
+    .catch(err =>
+      res.status(400).json({
+        message: 'The employee data could not be added. Please try again',
+        error: err.message
+      })
+    );
 });
 
 app.post('/contact', (req, res) => {
   knex('contact_info')
-  .insert(req.body)
-  .then(() => res.status(200).send('Contact info added'))
-  .catch(err =>
-    res.status(404).json({
-    message: 'The data you are looking for could not be found. Please try again '
+    .insert(req.body)
+    .then(data => res.status(201).json('Contact Information added'))
+    .catch(err =>
+      res.status(400).json({
+        message: 'The contact data could not be added. Please try again',
+        error: err.message
+      })
+    );
+});
+app.delete('/employees/:id', (req, res) => {
+  knex('employees')
+  .where({ id: req.params.id })
+  .delete('*')
+  .then(() => res.status(200).send('Employee deleted'))
+  .catch(err => res.status(404).json({
+    message: 'The data could not be deleted. Please try again'
+    }))
+});
+
+app.delete('/contact/:id', (req, res) => {
+  knex('contact_info')
+  .where({ id: req.params.id })
+  .delete('*')
+  .then(() => res.status(200).send('Contact Information deleted'))
+  .catch(err => res.status(404).json({
+    message: 'The data could not be deleted. Please try again'
     }))
 });
