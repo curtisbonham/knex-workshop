@@ -80,17 +80,53 @@ app.post('/employees', (req, res) => {
     );
 });
 
-app.post('/contact', (req, res) => {
-  knex('contact_info')
-    .insert(req.body)
-    .then(data => res.status(201).json('Contact Information added'))
-    .catch(err =>
-      res.status(400).json({
+app.post('/contact', async (req, res) => {
+  const {last_name, phone_number, email, address} = req.body;
+  try {
+    const employee = await knex('employees')
+    .where({last_name: last_name})
+    .select('id');
+    if (!employee){
+      return res.status(404).json({message: 'Employee not found. Please provide a valid employee name'
+      });
+  }
+   await knex('contact_info').insert({
+      email,
+      address,
+      phone_number,
+      employee_id: employee.id
+    });
+    res.status(201).json('Contact Information added');
+    } catch(err) {
+        res.status(400).json({
         message: 'The contact data could not be added. Please try again',
         error: err.message
-      })
-    );
-});
+      });
+    }
+    });
+
+    app.put('/employee/:id', (req, res) => {
+      knex('employees')
+      .update(req.body)
+      .where({id: req.params.id})
+      .then(data => res.status(201).send('Employee updated'))
+      .catch(err =>
+        res.status(404).json({
+        message: 'The employee data could not be updated. Please try again'
+        }))
+    });
+
+    app.put('/contacts/:id', (req, res) => {
+      knex('contact_info')
+      .update(req.body)
+      .where({id: req.params.id})
+      .then(data => res.status(201).send('Contact information updated'))
+      .catch(err =>
+        res.status(404).json({
+        message: 'The contact data could not be updated. Please try again'
+        }))
+    });
+
 app.delete('/employees/:id', (req, res) => {
   knex('employees')
   .where({ id: req.params.id })
