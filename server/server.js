@@ -25,7 +25,6 @@ app.get('/all', (req, res) => {
   }))
 })
 
-
 app.get('/employees', (req, res) => {
   knex('employees')
   .select('*')
@@ -35,7 +34,6 @@ app.get('/employees', (req, res) => {
     message: 'The data you are looking for could not be found. Please try again '
     }))
 })
-
 
 app.get('/employees/:id', (req, res) => {
   knex('employees')
